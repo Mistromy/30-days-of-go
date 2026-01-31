@@ -7,14 +7,20 @@ import (
 )
 
 type model struct {
-	items  []string
-	cursor int
+	items        []mydata
+	cursor       int
+	instructions string
+}
+
+type mydata struct {
+	name    string
+	enabled bool
 }
 
 func initialModel() model {
 	return model{
-		items:  []string{"test", "test2"},
-		cursor: 30,
+		items:  []mydata{{name: "test"}, {name: "test2"}, {name: "test3", enabled: true}, {name: "test4"}, {name: "test5"}},
+		cursor: 2,
 	}
 }
 
@@ -28,14 +34,42 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q":
 			return m, tea.Quit
+
+		case "up":
+			if m.cursor > 0 {
+				m.cursor--
+			}
+		case "down":
+			if m.cursor < len(m.items)-1 {
+				m.cursor++
+			}
+
+		case "enter":
+			m.instructions = m.items[m.cursor].name
+			m.items[m.cursor].enabled = !m.items[m.cursor].enabled
 		}
 	}
 	return m, nil
 }
 
-// TODO: implement View method
 func (m model) View() string {
-	return "Test"
+	bkt := "List:\n"
+	for i, item := range m.items {
+		if m.cursor == i {
+			checkbox := "[ ]"
+			if m.items[i].enabled == true {
+				checkbox = "[x]"
+			} else {
+				ckeckbox = "[ ]"
+			}
+
+			bkt = bkt + item.name + checkbox + " *\n"
+		} else {
+			bkt = bkt + item.name + "\n"
+		}
+	}
+	bkt = bkt + "\nPress q to quit.\n" + m.instructions
+	return bkt
 }
 
 func main() {
