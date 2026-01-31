@@ -56,7 +56,7 @@ func (m model) View() string {
 	bkt := "List:\n"
 	for i, item := range m.items {
 		checkbox := "[ ]"
-		if m.items[i].enabled == true {
+		if m.items[i].enabled {
 			checkbox = "[x]"
 		}
 
