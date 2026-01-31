@@ -45,30 +45,28 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "enter":
-			m.instructions = m.items[m.cursor].name
 			m.items[m.cursor].enabled = !m.items[m.cursor].enabled
 		}
 	}
+	m.instructions = m.items[m.cursor].name
 	return m, nil
 }
 
 func (m model) View() string {
 	bkt := "List:\n"
 	for i, item := range m.items {
-		if m.cursor == i {
-			checkbox := "[ ]"
-			if m.items[i].enabled == true {
-				checkbox = "[x]"
-			} else {
-				ckeckbox = "[ ]"
-			}
+		checkbox := "[ ]"
+		if m.items[i].enabled == true {
+			checkbox = "[x]"
+		}
 
+		if m.cursor == i {
 			bkt = bkt + item.name + checkbox + " *\n"
 		} else {
-			bkt = bkt + item.name + "\n"
+			bkt = bkt + item.name + checkbox + "\n"
 		}
 	}
-	bkt = bkt + "\nPress q to quit.\n" + m.instructions
+	bkt = bkt + "\n" + m.instructions + "\nPress Enter to toggle on/off.\nPress q to quit.\n"
 	return bkt
 }
 
