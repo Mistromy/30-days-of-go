@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -10,6 +11,8 @@ type model struct {
 	items        []mydata
 	cursor       int
 	instructions string
+	isediting    bool
+	textInput    textinput.Model
 }
 
 type mydata struct {
@@ -18,9 +21,15 @@ type mydata struct {
 }
 
 func initialModel() model {
+	ti := textinput.New()
+	ti.Placeholder = "New item: "
+	ti.Focus()
+	ti.CharLimit = 64
+	ti.Width = 20
 	return model{
-		items:  []mydata{{name: "test"}, {name: "test2"}, {name: "test3", enabled: true}, {name: "test4"}, {name: "test5"}},
-		cursor: 2,
+		items:     []mydata{{name: "test"}, {name: "test2"}, {name: "test3"}, {name: "test4"}, {name: "test5"}},
+		cursor:    0,
+		textInput: ti,
 	}
 }
 
@@ -31,36 +40,38 @@ func (m model) Init() tea.Cmd {
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "q":
-			return m, tea.Quit
-		}
-		if len(m.items) == 0 {
-			return m, nil
-		}
-		switch msg.String() {
-
-		case "up":
-			if m.cursor > 0 {
-				m.cursor--
+		if !m.isediting {
+			switch msg.String() {
+			case "q":
+				return m, tea.Quit
+			case "c":
+				m.isediting = true
+				m.instructions = "Text: "
 			}
-		case "down":
-			if m.cursor < len(m.items)-1 {
-				m.cursor++
+			if len(m.items) == 0 {
+				return m, nil
 			}
 
-		case "enter":
-			m.items[m.cursor].enabled = !m.items[m.cursor].enabled
-
-		case "backspace":
-			if m.cursor != len(m.items) {
-				m.items = append(m.items[:m.cursor], m.items[m.cursor+1:]...)
-				if m.cursor >= len(m.items) {
-					m.cursor = len(m.items) - 1
+			switch msg.String() {
+			case "up":
+				if m.cursor > 0 {
+					m.cursor--
+				}
+			case "down":
+				if m.cursor < len(m.items)-1 {
+					m.cursor++
+				}
+			case "enter":
+				m.items[m.cursor].enabled = !m.items[m.cursor].enabled
+			case "backspace":
+				if m.cursor != len(m.items) {
+					m.items = append(m.items[:m.cursor], m.items[m.cursor+1:]...)
+					if m.cursor >= len(m.items) {
+						m.cursor = len(m.items) - 1
+					}
 				}
 			}
 		}
-
 	}
 	if len(m.items) == 0 {
 		m.instructions = "No items left!"
