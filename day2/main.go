@@ -35,30 +35,32 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q":
 			return m, tea.Quit
 		}
-		if len(m.items) >= 1 {
-			switch msg.String() {
+		if len(m.items) == 0 {
+			return m, nil
+		}
+		switch msg.String() {
 
-			case "up":
-				if m.cursor > 0 {
-					m.cursor--
-				}
-			case "down":
-				if m.cursor < len(m.items)-1 {
-					m.cursor++
-				}
+		case "up":
+			if m.cursor > 0 {
+				m.cursor--
+			}
+		case "down":
+			if m.cursor < len(m.items)-1 {
+				m.cursor++
+			}
 
-			case "enter":
-				m.items[m.cursor].enabled = !m.items[m.cursor].enabled
+		case "enter":
+			m.items[m.cursor].enabled = !m.items[m.cursor].enabled
 
-			case "backspace":
-				if m.cursor != len(m.items) {
-					m.items = append(m.items[:m.cursor], m.items[m.cursor+1:]...)
-					if m.cursor >= len(m.items) {
-						m.cursor = len(m.items) - 1
-					}
+		case "backspace":
+			if m.cursor != len(m.items) {
+				m.items = append(m.items[:m.cursor], m.items[m.cursor+1:]...)
+				if m.cursor >= len(m.items) {
+					m.cursor = len(m.items) - 1
 				}
 			}
 		}
+
 	}
 	if len(m.items) == 0 {
 		m.instructions = "No items left!"
