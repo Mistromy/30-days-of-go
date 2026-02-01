@@ -46,6 +46,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			case "c":
 				m.isediting = true
+				m.textInput.SetValue("")
 				m.instructions = "New Item: "
 			}
 			if len(m.items) == 0 {
