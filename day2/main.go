@@ -46,7 +46,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			case "c":
 				m.isediting = true
-				m.instructions = "Text: "
+				m.instructions = "New Item: "
 			}
 			if len(m.items) == 0 {
 				return m, nil
@@ -71,13 +71,27 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 				}
 			}
+		} else {
+			switch msg.String() {
+			case "enter":
+				m.isediting = false
+				m.items = append(m.items, mydata{name: m.textInput.Value()})
+			}
+			var cmd tea.Cmd
+			m.textInput, cmd = m.textInput.Update(msg)
+			m.instructions = "New Item: " + m.textInput.View()
+
+			return m, cmd
 		}
 	}
-	if len(m.items) == 0 {
-		m.instructions = "No items left!"
-		return m, nil
+	if !m.isediting {
+		if len(m.items) == 0 {
+			m.instructions = "No items left!"
+			return m, nil
+		}
+		m.instructions = m.items[m.cursor].name
+
 	}
-	m.instructions = m.items[m.cursor].name
 	return m, nil
 }
 
